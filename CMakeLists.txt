@@ -1,20 +1,21 @@
-# ������
+# Сборка
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 project(v8unpack)
 
-# ���������� �������� ��� �������������
+# Установите политики для совместимости
+# --- Политики совместимости ---
 if(POLICY CMP0144)
-    cmake_policy(SET CMP0144 NEW)  # ��� BOOST_ROOT
+    cmake_policy(SET CMP0144 NEW)  # Для BOOST_ROOT
 endif()
 
 if(POLICY CMP0167)
-    cmake_policy(SET CMP0167 NEW)  # ��� FindBoost
+    cmake_policy(SET CMP0167 NEW)  # Для FindBoost
 endif()
 
-# ������� ���� � Boost
+# Укажите путь к Boost
 #set(BOOST_ROOT "C:/local/boost_1_88_0")
-#set(Boost_NO_SYSTEM_PATHS ON)  # ������������� ������������ BOOST_ROOT
+#set(Boost_NO_SYSTEM_PATHS ON)  # Принудительно использовать BOOST_ROOT
 
 
 set(v8unpack_VERSION_MAJOR 3)
@@ -104,7 +105,31 @@ set (Boost_USE_STATIC_LIBS ON)
 set (Boost_USE_MULTITHREADED OFF)
 set (Boost_USE_STATIC_RUNTIME ON)
 
-find_package (Boost 1.53 REQUIRED COMPONENTS filesystem system iostreams)
+# --- Кроссплатформенное определение путей ---
+if(WIN32)
+    # Попробуем стандартные пути для Windows
+    if(EXISTS "C:/local/boost_1_88_0")
+        set(BOOST_ROOT "C:/local/boost_1_88_0")
+    elseif(EXISTS "C:/Boost/boost_1_88_0")
+        set(BOOST_ROOT "C:/Boost/boost_1_88_0")
+    endif()
+elseif(UNIX)
+    # Для Linux / macOS
+    # Проверим возможные пути установки
+    find_path(BOOST_ROOT include/boost PATHS /usr /usr/local /opt/homebrew /opt/local)
+endif()
+
+# --- Поиск Boost ---
+find_package(Boost 1.74 REQUIRED COMPONENTS filesystem system iostreams)
+
+if(Boost_FOUND)
+    message(STATUS "✅ Boost найден: ${Boost_VERSION}")
+    message(STATUS "📂 Включаемые каталоги: ${Boost_INCLUDE_DIRS}")
+    message(STATUS "📦 Библиотеки: ${Boost_LIBRARIES}")
+    include_directories(${Boost_INCLUDE_DIRS})
+else()
+    message(FATAL_ERROR "❌ Boost не найден. Укажите путь вручную через -DBOOST_ROOT или установите Boost.")
+endif()
 
 include_directories (${Boost_INCLUDE_DIRS})
 target_link_libraries (v8unpack ${Boost_LIBRARIES})
