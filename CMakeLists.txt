@@ -17,6 +17,10 @@ endif()
 #set(BOOST_ROOT "C:/local/boost_1_88_0")
 #set(Boost_NO_SYSTEM_PATHS ON)  # Принудительно использовать BOOST_ROOT
 
+# --- Принудительно использовать старый FindBoost ---
+set(Boost_NO_BOOST_CMAKE ON)
+set(Boost_NO_SYSTEM_PATHS OFF)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(v8unpack_VERSION_MAJOR 3)
 set(v8unpack_VERSION_MINOR 0)
@@ -121,6 +125,7 @@ endif()
 
 # --- Поиск Boost ---
 find_package(Boost 1.74 REQUIRED COMPONENTS filesystem system iostreams)
+
 
 if(Boost_FOUND)
     message(STATUS "✅ Boost найден: ${Boost_VERSION}")
