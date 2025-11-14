@@ -8,10 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     # install and cache dependencies
     - name: Cache boost
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v4
       id: cache-boost
       with:
         path: "~/boost"
@@ -45,7 +45,7 @@ jobs:
       run: build/tst/Example2_tst
     # upload artifact, game binary
     - name: Upload Example binary
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: upload binary
         path: build/src/Example
