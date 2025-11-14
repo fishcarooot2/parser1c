@@ -5,22 +5,22 @@ project(v8unpack)
 
 # Установите политики для совместимости
 # --- Политики совместимости ---
-if(POLICY CMP0144)
-    cmake_policy(SET CMP0144 NEW)  # Для BOOST_ROOT
-endif()
+#if(POLICY CMP0144)
+#    cmake_policy(SET CMP0144 NEW)  # Для BOOST_ROOT
+#endif()
 
-if(POLICY CMP0167)
-    cmake_policy(SET CMP0167 NEW)  # Для FindBoost
-endif()
+#if(POLICY CMP0167)
+#    cmake_policy(SET CMP0167 NEW)  # Для FindBoost
+#endif()
 
 # Укажите путь к Boost
 #set(BOOST_ROOT "C:/local/boost_1_88_0")
 #set(Boost_NO_SYSTEM_PATHS ON)  # Принудительно использовать BOOST_ROOT
 
 # --- Принудительно использовать старый FindBoost ---
-set(Boost_NO_BOOST_CMAKE ON)
-set(Boost_NO_SYSTEM_PATHS OFF)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+#set(Boost_NO_BOOST_CMAKE ON)
+#set(Boost_NO_SYSTEM_PATHS ON)
+#list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(v8unpack_VERSION_MAJOR 3)
 set(v8unpack_VERSION_MINOR 0)
@@ -110,18 +110,18 @@ set (Boost_USE_MULTITHREADED OFF)
 set (Boost_USE_STATIC_RUNTIME ON)
 
 # --- Кроссплатформенное определение путей ---
-if(WIN32)
+#if(WIN32)
     # Попробуем стандартные пути для Windows
-    if(EXISTS "C:/local/boost_1_88_0")
-        set(BOOST_ROOT "C:/local/boost_1_88_0")
-    elseif(EXISTS "C:/Boost/boost_1_88_0")
-        set(BOOST_ROOT "C:/Boost/boost_1_88_0")
-    endif()
-elseif(UNIX)
+#    if(EXISTS "C:/local/boost_1_88_0")
+#        set(BOOST_ROOT "C:/local/boost_1_88_0")
+#    elseif(EXISTS "C:/Boost/boost_1_88_0")
+#        set(BOOST_ROOT "C:/Boost/boost_1_88_0")
+#    endif()
+#elseif(UNIX)
     # Для Linux / macOS
     # Проверим возможные пути установки
-    find_path(BOOST_ROOT include/boost PATHS /usr /usr/local /opt/homebrew /opt/local)
-endif()
+#    find_path(BOOST_ROOT include/boost PATHS /usr /usr/local /opt/homebrew /opt/local)
+#endif()
 
 # --- Поиск Boost ---
 find_package(Boost 1.74 REQUIRED COMPONENTS filesystem system iostreams)
