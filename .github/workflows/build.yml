@@ -1,51 +1,51 @@
-name: Build v8unpack
-
+name: build and run tests
 on:
   push:
-    branches: [ main, master ]
+    branches: [ master ]
   pull_request:
-    branches: [ main, master ]
-
+    branches: [ master ]
 jobs:
   build:
-    name: Build on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest]
-
+    runs-on: ubuntu-latest
     steps:
-      - name: 🧩 Checkout source
-        uses: actions/checkout@v4
-
-      - name: ⚙️ Install dependencies (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt update
-          sudo apt install -y build-essential cmake libboost-all-dev
-
-      - name: ⚙️ Install dependencies (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $BoostDir = "C:\local\boost_1_88_0"
-          if (!(Test-Path $BoostDir)) {
-            Invoke-WebRequest -Uri "https://archives.boost.io/release/1.88.0/source/boost_1_88_0.zip" -OutFile "boost.zip"
-            Expand-Archive boost.zip -DestinationPath "C:\local"
-          }
-
-      - name: 🧱 Configure project
-        run: |
-          cmake -B build -S .
-        shell: bash
-
-      - name: 🧰 Build project
-        run: |
-          cmake --build build --config Release
-        shell: bash
-
-      - name: ✅ Verify executable
-        run: |
-          ls build
-        shell: bash
+    - uses: actions/checkout@v2
+    # install and cache dependencies
+    - name: Cache boost
+      uses: actions/cache@v1.0.3
+      id: cache-boost
+      with:
+        path: "~/boost"
+        key: libboost1.88-dev
+    - name: Install boost
+      env:
+        CACHE_HIT: ${{steps.cache-boost.outputs.cache-hit}}
+      run: |
+        if [[ "$CACHE_HIT" == 'true' ]]; then
+          sudo cp --force --recursive ~/boost/* /
+        else
+          sudo apt-get update && sudo apt-get install -yq libboost1.88-dev
+          mkdir -p ~/boost
+          for dep in libboost1.88-dev; do
+              dpkg -L $dep | while IFS= read -r f; do if test -f $f; then echo $f; fi; done | xargs cp --parents --target-directory ~/boost/
+          done
+        fi
+    # build project
+    - name: mkdir
+      run: mkdir build
+    - name: cmake build
+      run: cmake -Bbuild -H.
+    - name: cmake make
+      run: cmake --build build/ --target all
+      env:
+        MAKEFLAGS: "-j2"
+    # run tests
+    - name: run test 1
+      run: build/tst/Example1_tst
+    - name: run test 2
+      run: build/tst/Example2_tst
+    # upload artifact, game binary
+    - name: Upload Example binary
+      uses: actions/upload-artifact@v1
+      with:
+        name: upload binary
+        path: build/src/Example
